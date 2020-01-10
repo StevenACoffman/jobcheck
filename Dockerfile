@@ -21,8 +21,20 @@ RUN apk add --no-cache --update \
         git \
         ca-certificates \
         bash make curl \
-        && update-ca-certificates --fresh \
-        && adduser -D -g '' appuser
+        && update-ca-certificates
+
+ENV USER=appuser
+ENV UID=10001
+
+# See https://stackoverflow.com/a/55757473/12429735
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/go" \
+    --no-create-home \
+    --uid "${UID}" \
+    "${USER}"
+
 ENV GOFLAGS="-mod=readonly"
 
 # Moving outside of $GOPATH forces modules on without having to set ENVs
@@ -38,7 +50,6 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
       -ldflags='-w -s -extldflags "-static"' -a \
       -o /go/bin/main ./main.go
-RUN ls -la /go/bin/
 ############################
 # STEP 2 build a small image
 ############################
