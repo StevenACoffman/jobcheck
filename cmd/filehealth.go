@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -21,7 +22,11 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("filehealth called")
 		filename := "/tmp/healthy"
-		var threshold float64 = 30
+		var threshold int = 30
+		if len(args) > 0 {
+			thresholdVal := args[0]
+			threshold, _ = strconv.Atoi(thresholdVal)
+		}
 		healthy := livenessProbe(filename, threshold)
 
 		if !healthy {
@@ -44,7 +49,7 @@ func init() {
 	// filehealthCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func livenessProbe(filename string, threshold float64) bool {
+func livenessProbe(filename string, threshold int) bool {
 	// if you aren't using UTC you are wrong.
 	loc, _ := time.LoadLocation("UTC")
 	now := time.Now().In(loc)
@@ -58,7 +63,7 @@ func livenessProbe(filename string, threshold float64) bool {
 	}
 
 	modTime := file.ModTime()
-	elapsed := now.Sub(modTime).Seconds()
+	elapsed := int(now.Sub(modTime).Seconds())
 
 	fmt.Println("Last modified time : ", modTime)
 	fmt.Println("Seconds since last file modification : ", elapsed)
