@@ -5,9 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"os/signal"
 	"strconv"
-	"syscall"
 	"time"
 
 	"github.com/StevenACoffman/grace"
@@ -46,7 +44,7 @@ to quickly create a Cobra application.`,
 					case <-ticker.C:
 						touchFile(filename)
 						// testcase what happens if an error occured
-						//return fmt.Errorf("test error ticker 2s")
+						// return fmt.Errorf("test error ticker 2s")
 					case <-ctx.Done():
 						log.Printf("closing ticker 2s goroutine\n")
 						return nil
@@ -75,7 +73,7 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	//sentinelCmd.Flags().IntVarP(&sleep,"sleep", "s", 0, "Sleep duration in seconds")
+	// sentinelCmd.Flags().IntVarP(&sleep,"sleep", "s", 0, "Sleep duration in seconds")
 }
 
 func touchFile(filename string) {
@@ -86,9 +84,12 @@ func touchFile(filename string) {
 	file, err := os.Stat(filename)
 
 	if os.IsNotExist(err) {
-		//write timestamp to file so you can compare initial creation to last modification
+		// write timestamp to file so you can compare initial creation to last modification
 		const stampF = "20060102150405"
 		err = ioutil.WriteFile(filename, []byte(now.Format(stampF)), 0644)
+		if err != nil {
+			fmt.Println(err)
+		}
 		file, err = os.Stat(filename)
 	}
 
@@ -107,17 +108,4 @@ func touchFile(filename string) {
 	}
 
 	fmt.Println("Changed the file time : ", now.Format(time.RFC3339))
-}
-
-func getStopSignalsChannel() chan os.Signal {
-
-	signalChannel := make(chan os.Signal, 1)
-	signal.Notify(signalChannel,
-		os.Interrupt,    // interrupt is syscall.SIGINT, Ctrl+C
-		syscall.SIGQUIT, // Ctrl-\
-		syscall.SIGHUP,  // "terminal is disconnected"
-		syscall.SIGTERM, // "the normal way to politely ask a program to terminate"
-	)
-	return signalChannel
-
 }

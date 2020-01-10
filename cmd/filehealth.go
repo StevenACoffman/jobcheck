@@ -58,7 +58,7 @@ func livenessProbe(filename string, threshold int) bool {
 
 	if err != nil {
 		fmt.Println(err)
-		//if file does not exist, or is unreadable, then it should fail liveness probe
+		// if file does not exist, or is unreadable, then it should fail liveness probe
 		return false
 	}
 
