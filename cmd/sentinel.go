@@ -10,8 +10,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/spf13/cobra"
 	"github.com/StevenACoffman/grace"
+	"github.com/spf13/cobra"
 )
 
 // sentinelCmd represents the sentinel command
@@ -109,7 +109,6 @@ func touchFile(filename string) {
 	fmt.Println("Changed the file time : ", now.Format(time.RFC3339))
 }
 
-
 func getStopSignalsChannel() chan os.Signal {
 
 	signalChannel := make(chan os.Signal, 1)
@@ -122,5 +121,3 @@ func getStopSignalsChannel() chan os.Signal {
 	return signalChannel
 
 }
-
-
